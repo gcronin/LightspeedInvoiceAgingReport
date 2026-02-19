@@ -3,6 +3,7 @@ from tkinter import filedialog
 import csv
 from datetime import datetime
 from datetime import date
+import math
 
 def select_csv_file():
     """Opens a file dialog to select a CSV file and prints its path."""
@@ -65,7 +66,7 @@ def select_csv_file():
                                 paidInvoices.append([row[2], row[1], row[5]])
                             else:
                                 #print(remainingCredit)
-                                unpaidInvoices.append([row[2], row[1], remainingCredit])
+                                unpaidInvoices.append([row[2], row[1], round(remainingCredit, 2)])
                                 break
 
             foundFirstUnpaidInvoiceFlag = 0
@@ -81,6 +82,7 @@ def select_csv_file():
                                 if row[5] > 0:
                                     unpaidInvoices.append([row[2], row[1], row[5]])
 
+                # Find the Days Past for each unpaid invoice and add this to the list.
                 for row in unpaidInvoices:
                     subString = row[1].partition(' ')[0]
                     dt_obj1 = date.today()
@@ -91,15 +93,24 @@ def select_csv_file():
                     totalBalance += row[2]
                 print(totalBalance)
                 print(unpaidInvoices)
+
+                unpaidInvoices.insert(0, ["Sale #", "Date", "Amount Owed", "Days Past"])
+
+                with open(file_path, mode='r', newline='') as file:
+                    reader = csv.reader(file)
+                    existing_data = list(reader)
+                    data_to_write = unpaidInvoices + existing_data
+
+                with open(file_path, mode='w', newline='') as file:
+                    writer = csv.writer(file)
+                    writer.writerows(data_to_write)
+                    status_label.config(text=f"Unpaid Invoices Written to CSV File")
+                    
             except:
                 print("Nothing Owed")
+                status_label.config(text=f"No Unpaid Invoices")
 
-        with open(file_path, mode='a', newline='') as file:
-            writer = csv.writer(file)
-            # blank line
-            writer.writerow([]) 
-            # Write unpaid invoices
-            writer.writerows(unpaidInvoices)
+
 
 
 root = tk.Tk()
@@ -113,5 +124,12 @@ select_button = tk.Button(
     command=select_csv_file
 )
 select_button.pack(pady=20)
+
+status_label = tk.Label(
+    root, 
+    text="Please Select Payments CSV file...", 
+    wraplength=350
+)
+status_label.pack(pady=10)
 
 root.mainloop()
