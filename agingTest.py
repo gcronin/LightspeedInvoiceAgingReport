@@ -66,7 +66,7 @@ def select_csv_file():
                                 paidInvoices.append([row[2], row[1], row[5]])
                             else:
                                 #print(remainingCredit)
-                                unpaidInvoices.append([row[2], row[1], round(remainingCredit, 2)])
+                                unpaidInvoices.append([row[2], row[1], row[5], round(row[5]-remainingCredit, 2), round(remainingCredit, 2)])
                                 break
 
             foundFirstUnpaidInvoiceFlag = 0
@@ -80,7 +80,7 @@ def select_csv_file():
                         elif foundFirstUnpaidInvoiceFlag:
                             if row[3] == "Credit Account":
                                 if row[5] > 0:
-                                    unpaidInvoices.append([row[2], row[1], row[5]])
+                                    unpaidInvoices.append([row[2], row[1], row[5], "0.00", row[5]])
 
                 # Find the Days Past for each unpaid invoice and add this to the list.
                 for row in unpaidInvoices:
@@ -94,8 +94,12 @@ def select_csv_file():
                 print(totalBalance)
                 print(unpaidInvoices)
 
-                unpaidInvoices.insert(0, ["Sale #", "Date", "Amount Owed", "Days Past"])
-
+                unpaidInvoices.insert(0, ["Sale #", "Date", "Amount Invoiced", "Amount Paid", "Amount Owed", "Days Past"])
+                unpaidInvoices.insert(0, ["", "", "", "", "", ""])
+                unpaidInvoices.insert(0, ["Account Balance:", "", totalBalance, "", "", ""])
+                unpaidInvoices.insert(0, ["Pavingstone Supply Credit Statement", "", "", "", "", date.today()])
+                unpaidInvoices.append(["", "", "", "", "", ""])
+                
                 with open(file_path, mode='r', newline='') as file:
                     reader = csv.reader(file)
                     existing_data = list(reader)
