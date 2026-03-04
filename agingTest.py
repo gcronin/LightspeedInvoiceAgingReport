@@ -71,6 +71,10 @@ def select_csv_file():
 
             foundFirstUnpaidInvoiceFlag = 0
             totalBalance = 0.0
+            underThirty = 0.0
+            thirtyToSixty = 0.0
+            sixtyToNinety = 0.0
+            overNinety = 0.0
 
             try:
                 if unpaidInvoices[0]:
@@ -91,6 +95,14 @@ def select_csv_file():
                     days_difference = difference.days
                     row.append(days_difference)
                     totalBalance += row[2]
+                    if days_difference < 30:
+                        underThirty += row[4]
+                    elif days_difference < 60:
+                        thirtyToSixty += row[4]
+                    elif days_difference < 90:
+                        sixtyToNinety += row[4]
+                    elif days_difference >= 90:
+                        overNinety += row[4]
                 print(totalBalance)
                 print(unpaidInvoices)
 
@@ -98,6 +110,11 @@ def select_csv_file():
                 unpaidInvoices.insert(0, ["", "", "", "", "", ""])
                 unpaidInvoices.insert(0, ["Account Balance:", "", totalBalance, "", "", ""])
                 unpaidInvoices.insert(0, ["Pavingstone Supply Credit Statement", "", "", "", "", date.today()])
+                unpaidInvoices.append(["", "", "", "", "", ""])
+                unpaidInvoices.append(["Under 30: ", "", underThirty, "", "", ""])
+                unpaidInvoices.append(["30 - 60: ", "", thirtyToSixty, "", "", ""])
+                unpaidInvoices.append(["60 - 90: ", "", sixtyToNinety, "", "", ""])
+                unpaidInvoices.append(["Over 90: ", "", overNinety, "", "", ""])
                 unpaidInvoices.append(["", "", "", "", "", ""])
                 
                 with open(file_path, mode='r', newline='') as file:
